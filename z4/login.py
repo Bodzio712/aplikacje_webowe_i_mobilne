@@ -9,9 +9,13 @@ from flask import send_from_directory
 
 import csv
 import os
+import uuid
+import jwt
+import datetime
 
 app = Flask(__name__)
 app.secret_key = b'35325fsdgsdg4gsd3fsge'
+jwt_secret_key = '124hgjhghj214214124jj'
 
 #Trasownik do strony głównej
 @app.route('/pogodzip/login/')
