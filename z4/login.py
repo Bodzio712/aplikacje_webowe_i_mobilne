@@ -6,6 +6,7 @@ from flask import request
 from flask import render_template
 from flask import redirect
 from flask import send_from_directory
+from flask import url_for
 
 import csv
 import os
@@ -63,24 +64,31 @@ def home():
             path1 = ''
         if len(files) >= 3:
             file2 = files[2]
+            path2 = path + file2
         else:
             file2 = ''
+            path2 = ''
         if len(files) >= 4:
             file3 = files[3]
+            path3 = path + file3
         else:
             file3 = ''
+            path3 = ''
         if len(files) >= 5:
             file4 = files[4]
+            path4 = path + file4
         else:
             file4 = ''
+            path4 = ''
 
-        return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1)
+        return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1, path2=path2, path3=path3, path4=path4, token=request.args.get('token'))
     else:
         return redirect('/pogodzip/login/login')
 
 #Trasownik do wylogowywania się
 @app.route('/pogodzip/login/logout')
 def logout():
+    r.delete('sawickij:webapp:' + session['sid'])
     session.pop('user', None)
     return redirect('/pogodzip/login/')
 
@@ -124,7 +132,7 @@ def checkLogin():
         r.hset('pogodzip:webapp:' + sid, 'login', _login)
         session['sid'] = sid
         session['token'] = token
-            return redirect('/pogodzip/login/home')
+            return redirect(url_for('home', token=token))
     return redirect('/pogodzip/login/login')
 
 #Trasownik do pobierania plików
