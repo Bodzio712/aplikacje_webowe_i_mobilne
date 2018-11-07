@@ -8,11 +8,31 @@
 	<body>
 		<h1>Pliki Użytkownika:</h1>
 		<ul>
-			<li><a href="{{path0}}" download>{{file0}}</a></li>
-			<li><a href="{{path1}}" download>{{file1}}</a></li>
-			<li><a href="{{file2}}" download>{{file2}}</a></li>
-			<li><a href="{{file3}}" download>{{file3}}</a></li>
-			<li><a href="{{file4}}" download>{{file4}}</a></li>
+			<form method="POST" action="{{path0}}" enctype="multipart/form-data">
+				<input type="submit" value="{{file0}}">
+				<input type="hidden" name="token" value="{{token}}">
+			</form>
+
+			<form method="POST" action="{{path1}}" enctype="multipart/form-data">
+				<input type="submit" value="{{file1}}">
+				<input type="hidden" name="token" value="{{token}}">
+			</form>
+			
+			<form method="POST" action="{{path2}}" enctype="multipart/form-data">
+				<input type="submit" value="{{file2}}">
+				<input type="hidden" name="token" value="{{token}}">
+			</form>
+			
+			<form method="POST" action="{{path3}}" enctype="multipart/form-data">
+				<input type="submit" value="{{file3}}">
+				<input type="hidden" name="token" value="{{token}}">
+			</form>
+
+			<form method="POST" action="{{path4}}" enctype="multipart/form-data">
+				<input type="submit" value="{{file4}}">
+				<input type="hidden" name="token" value="{{token}}">
+			</form>
+			
 		</ul>
 		<br>
                 <nav>
