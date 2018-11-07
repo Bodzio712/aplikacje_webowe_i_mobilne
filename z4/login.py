@@ -90,6 +90,8 @@ def home():
 def logout():
     r.delete('sawickij:webapp:' + session['sid'])
     session.pop('user', None)
+    session.pop('sid', None)
+    session.pop('token', None)
     return redirect('/pogodzip/login/')
 
 #Trasownik do sprawdzania rejestracji
@@ -132,13 +134,15 @@ def checkLogin():
         r.hset('pogodzip:webapp:' + sid, 'login', _login)
         session['sid'] = sid
         session['token'] = token
-            return redirect(url_for('home', token=token))
+            return redirect('/pogodzip/login/home')
     return redirect('/pogodzip/login/login')
 
+"""
 #Trasownik do pobierania plików
 @app.route('/pogodzip/login/userfiles/<path:file0>', methods=['GET', 'POST'])
 def download(file0):
     return send_from_directory(directory='userfiles', filename=file0)
+"""
 
 #Trasownik do pliku .CSS
 @app.route('/pogodzip/login/static/style.css', methods=['GET'])
@@ -151,6 +155,7 @@ def downloadCss():
 def upload():
     return render_template('upload.html')
 
+"""
 #Trasownik do metody obsługującej wysyłanie piku
 @app.route('/pogodzip/login/uploading', methods=['POST'])
 def uploading():
@@ -166,6 +171,7 @@ def uploading():
             return redirect('/pogodzip/login/home')
     else:
         return redirect('/pogodzip/login/login')
+"""
 
 #Sprawdzanie użytkowników
 def checkUser(login, password):
