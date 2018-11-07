@@ -21,43 +21,44 @@ jwt_secret_key =  '124hgjhghj214214124jj'
 r = redis.Redis()
 
 #Trasownik do pobierania plików
-@app.route('/pogodzip/login/userfiles/<path:file0>', methods=['GET', 'POST'])
+@app.route('/pogodzip/transfer/userfiles/<path:file0>', methods=['GET', 'POST'])
 def download(file0):
-  token = reqest.from['token']
-  if tokenVerified(token):
-    return send_from_directory(directory='userfiles', filename=file0)
-  else:
-    return redirect('/pogodzip/login/logout')
+    token = request.form['token']
+    if tokenVerified(token):
+        return send_from_directory(directory='userfiles', filename=file0)
+    else:
+        return redirect('/pogodzip/login/logout')
 
 #Trasownik do metody obsługującej wysyłanie piku
-@app.route('/pogodzip/login/uploading', methods=['POST'])
+@app.route('/pogodzip/transfer/uploading', methods=['POST'])
 def uploading():
-  token = request.form['token']
-  if tokenVerified(token):
-    user = getUserFromToken(token)
-    path = 'userfiles/' + str(user) + '/'
-    files = os.listdir('userfiles/' + str(user) + '/')
-    toUpload = request.files['file']
-    if len(files) <5:
-      toUpload.save(path + toUpload.filename)
-      return redirect('/pogodzip/login/home')
-      else:
-        return redirect('/pogodzip/login/home')
+    token = request.form['token']
+    if tokenVerified(token):
+        user = getUserFromToken(token)
+        path = 'userfiles/' + str(user) + '/'
+        files = os.listdir('userfiles/' + str(user) + '/')
+        toUpload = request.files['file']
+        if len(files) <5:
+            toUpload.save(path + toUpload.filename)
+            return redirect('/pogodzip/login/home')
+        else:
+            return redirect('/pogodzip/login/home')
     else:
       return redirect('/pogodzip/login/login')
 
 def tokenVerified(token):
-  token_parts = {}
-  try:
-    token_parts = jwt.decode(token, jwt_secret_key)
-  except jwt.ExpiredSignatureError:
-    return False
-  return token_parts['login'] == str(r.hget('sawickij:webapp:' + token_parts['sid'], 'login'))[2:-1]
+    token_parts = {}
+    print(token)
+    try:
+        token_parts = jwt.decode(token, jwt_secret_key)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError) as e:
+        return False
+    return token_parts['login'] == str(r.hget('pogodzip:webapp:' + token_parts['sid'], 'login'))[2:-1]
 
 def getUserFromToken(token):
-  token_parts = {}
-  try:
-    token_parts = jwt.decode(token, jwt_secret_key)
-  except jwt.ExpiredSignatureError:
-    return False
-return token_parts['login']
+    token_parts = {}
+    try:
+        token_parts = jwt.decode(token, jwt_secret_key)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError) as e:
+        return False
+    return token_parts['login']

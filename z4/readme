@@ -8,6 +8,8 @@ Do zrealizowania:
 
 Alias do uruchamiania serwera:
 alias serwer='uwsgi --ini login.ini'
+uwsgi --ini transfer.ini
+
 
 jwt - żetony
 

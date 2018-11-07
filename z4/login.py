@@ -13,6 +13,7 @@ import os
 import uuid
 import jwt
 import datetime
+import redis
 
 app = Flask(__name__)
 app.secret_key = b'35325fsdgsdg4gsd3fsge'
@@ -46,7 +47,8 @@ def register():
 def home():
     if session.get('user'):
         user = session['user']
-        path = 'userfiles/' + str(user) + '/'
+        token = session['token']
+        path = '/pogodzip/transfer/userfiles/' + str(user) + '/'
         files = os.listdir('userfiles/' + str(user) + '/')
 
         #Przypisywanie ściezek do pilków
@@ -81,7 +83,7 @@ def home():
             file4 = ''
             path4 = ''
 
-        return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1, path2=path2, path3=path3, path4=path4, token=request.args.get('token'))
+        return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1, path2=path2, path3=path3, path4=path4, token=token)
     else:
         return redirect('/pogodzip/login/login')
 
@@ -130,19 +132,12 @@ def checkLogin():
             'sid': sid,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
             }
-        token = str(jwt.encode(token_elems,jwt_secret_key))[2:-1]
-        r.hset('pogodzip:webapp:' + sid, 'login', _login)
+        token = str(jwt.encode(token_elems, jwt_secret_key))[2:-1]
+        r.hset('pogodzip:webapp:'+sid, 'login', _login)
         session['sid'] = sid
         session['token'] = token
-            return redirect('/pogodzip/login/home')
+        return redirect('/pogodzip/login/home')
     return redirect('/pogodzip/login/login')
-
-"""
-#Trasownik do pobierania plików
-@app.route('/pogodzip/login/userfiles/<path:file0>', methods=['GET', 'POST'])
-def download(file0):
-    return send_from_directory(directory='userfiles', filename=file0)
-"""
 
 #Trasownik do pliku .CSS
 @app.route('/pogodzip/login/static/style.css', methods=['GET'])
@@ -155,25 +150,9 @@ def downloadCss():
 def upload():
     return render_template('upload.html')
 
-"""
-#Trasownik do metody obsługującej wysyłanie piku
-@app.route('/pogodzip/login/uploading', methods=['POST'])
-def uploading():
-    if session.get('user'):
-        user = session['user']
-        path = 'userfiles/' + str(user) + '/'
-        files = os.listdir('userfiles/' + str(user) + '/')
-        toUpload = request.files['file']
-        if len(files) <5:
-            toUpload.save(path + toUpload.filename)
-            return redirect('/pogodzip/login/home')
-        else:
-            return redirect('/pogodzip/login/home')
-    else:
-        return redirect('/pogodzip/login/login')
-"""
-
 #Sprawdzanie użytkowników
 def checkUser(login, password):
     redisPass = str(r.hget('pogodzip:webapp:users', login))[2:-1]
-    return check_password_hash(redisPass, password)
+    if redisPass == password:
+        return True
+    return False
