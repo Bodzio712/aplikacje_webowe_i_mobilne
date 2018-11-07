@@ -17,6 +17,8 @@ app = Flask(__name__)
 app.secret_key = b'35325fsdgsdg4gsd3fsge'
 jwt_secret_key = '124hgjhghj214214124jj'
 
+r = redis.Redis()
+
 #Trasownik do strony głównej
 @app.route('/pogodzip/login/')
 @app.route('/pogodzip/login/index')
@@ -110,14 +112,19 @@ def checkLogin():
     _login = request.form['login']
     _password = request.form['pass']
 
-    with open('users', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-
-        #Sprawdzanie wprowadzonych danych z zdefioniowanymi w pliku CSV
-        for row in reader:
-            if _login == row['login'] and _password == row['pass']:
-                session['user'] = _login
-                return redirect('/pogodzip/login/home')
+    if checkUser(_login, _password):
+        session['user'] = _login
+        sid = str(uuid.uuid4())
+        token_elems = {
+            'login': _login,
+            'sid': sid,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+            }
+        token = str(jwt.encode(token_elems,jwt_secret_key))[2:-1]
+        r.hset('pogodzip:webapp:' + sid, 'login', _login)
+        session['sid'] = sid
+        session['token'] = token
+            return redirect('/pogodzip/login/home')
     return redirect('/pogodzip/login/login')
 
 #Trasownik do pobierania plików
@@ -151,3 +158,8 @@ def uploading():
             return redirect('/pogodzip/login/home')
     else:
         return redirect('/pogodzip/login/login')
+
+#Sprawdzanie użytkowników
+def checkUser(login, password):
+    redisPass = str(r.hget('pogodzip:webapp:users', login))[2:-1]
+    return check_password_hash(redisPass, password)
