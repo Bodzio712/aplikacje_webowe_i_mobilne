@@ -121,6 +121,11 @@ def checkLogin():
 def download(file0):
     return send_from_directory(directory='userfiles', filename=file0)
 
+#Trasownik do pliku .CSS
+@app.route('/pogodzip/login/static/style.css', methods=['GET'])
+def downloadCss():
+    return send_from_directory(directory='static', filename='style.css')
+
 #Trasownik do wysyłania plików
 @app.route('/pogodzip/login/upload')
 @app.route('/pogodzip/login/upload.html')
