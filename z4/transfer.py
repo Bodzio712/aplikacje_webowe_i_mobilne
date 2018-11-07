@@ -33,6 +33,7 @@ def download(file0):
 @app.route('/pogodzip/transfer/uploading', methods=['POST'])
 def uploading():
     token = request.form['token']
+    print(token)
     if tokenVerified(token):
         user = getUserFromToken(token)
         path = 'userfiles/' + str(user) + '/'

@@ -90,7 +90,7 @@ def home():
 #Trasownik do wylogowywania się
 @app.route('/pogodzip/login/logout')
 def logout():
-    r.delete('sawickij:webapp:' + session['sid'])
+    r.delete('pogodzip:webapp:' + session['sid'])
     session.pop('user', None)
     session.pop('sid', None)
     session.pop('token', None)
@@ -148,7 +148,7 @@ def downloadCss():
 @app.route('/pogodzip/login/upload')
 @app.route('/pogodzip/login/upload.html')
 def upload():
-    return render_template('upload.html')
+    return render_template('upload.html', token=session['token'])
 
 #Sprawdzanie użytkowników
 def checkUser(login, password):
