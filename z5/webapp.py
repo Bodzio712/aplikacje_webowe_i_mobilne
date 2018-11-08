@@ -15,41 +15,45 @@ import jwt
 import datetime
 import redis
 
+#Wstępna konfiguracja aplikacji
 app = Flask(__name__)
 app.secret_key = b'35325fsdgsdg4gsd3fsge'
 jwt_secret_key = '124hgjhghj214214124jj'
 
+#Inicjalizacja bazy danych Redis
 r = redis.Redis()
 
 #Trasownik do strony głównej
-@app.route('/pogodzip/login/')
-@app.route('/pogodzip/login/index')
-@app.route('/pogodzip/login/index.html')
+@app.route('/pogodzip/webapp/')
+@app.route('/pogodzip/webapp/index')
+@app.route('/pogodzip/webapp/index.html')
 def index():
     return render_template('index.html')
 
 #Trasownik do logowania
-@app.route('/pogodzip/login/login')
-@app.route('/pogodzip/login/login.html')
+@app.route('/pogodzip/webapp/login')
+@app.route('/pogodzip/webapp/login.html')
 def login():
     return render_template('login.html')
 
 #Trasownik do okna rejestracji
-@app.route('/pogodzip/login/register')
-@app.route('/pogodzip/login/register.html')
+@app.route('/pogodzip/webapp/register')
+@app.route('/pogodzip/webapp/register.html')
 def register():
     return render_template('register.html')
 
-#Trasownik do panelu użytkownika
-@app.route('/pogodzip/login/home')
-@app.route('/pogodzip/login/home.html')
-@app.route('/pogodzip/login/download')
+#Trasownik do panelu użytkownika/pobierania
+@app.route('/pogodzip/webapp/home')
+@app.route('/pogodzip/webapp/home.html')
+@app.route('/pogodzip/webapp/download')
 def home():
     if session.get('user'):
+        #Wyciąganie danych o użytkowniku
         user = session['user']
         token = session['token']
-        path = '/pogodzip/transfer/userfiles/' + str(user) + '/'
-        files = os.listdir('userfiles/' + str(user) + '/')
+        userfiles = str(r.hget('pogodzip:webapp:paths', user))[2:-1]
+        path = '/pogodzip/dl/' + userfiles + '/'
+        files = os.listdir(userfiles)
 
         #Przypisywanie ściezek do pilków
         if len(files) >= 1:
@@ -82,35 +86,45 @@ def home():
         else:
             file4 = ''
             path4 = ''
-
+        #Renderowanie strony z plikami do pobrania
         return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1, path2=path2, path3=path3, path4=path4, token=token)
     else:
-        return redirect('/pogodzip/login/login')
+        #Przekierowanie do logowania jeśli uzytkownik nie jest zalogowany
+        return redirect('/pogodzip/webapp/login')
 
 #Trasownik do wylogowywania się
-@app.route('/pogodzip/login/logout')
+@app.route('/pogodzip/webapp/logout')
 def logout():
+    #Usuwanie danych o sesji z bazy danych
     r.delete('pogodzip:webapp:' + session['sid'])
+    #Wygaszanie ciasteczka
     session.pop('user', None)
     session.pop('sid', None)
     session.pop('token', None)
-    return redirect('/pogodzip/login/')
+    #Przekierowanie do strony głównej aplikacji
+    return redirect('/pogodzip/webapp/')
 
-#Trasownik do sprawdzania rejestracji
-@app.route('/pogodzip/login/checkRegister', methods=['POST'])
+#Trasownik do rejezstrowania użytkownika
+@app.route('/pogodzip/webapp/checkRegister', methods=['POST'])
 def checkRegister():
     _login = request.form['login']
     _password = request.form['pass']
 
     if r.hget('pogodzip:webapp:users', _login) == None:
+        #Generowanie SIDa do uniezależneinia nazwy katalogu użytkownika od nazwy użytkownika
+        sid = str(uuid.uuid4())
+        #Dodawanie użytkownika do bazy danych
         r.hset('pogodzip:webapp:users', _login, _password)
-        path = "userfiles/"+_login
+        #Generowanie katalogu użytkownika na podstawie SIDa
+        path = "userfiles/"+sid
         os.makedirs(path)
-    return redirect('/pogodzip/login/login')
+        #Dodawanie ścieżki do bazy danych, która przechowuje dane o powiązaniach nazwy użytkownika z katalogiem
+        r.hset('pogodzip:webapp:paths', _login, path)
+    return redirect('/pogodzip/webapp/login')
 
 
 #Trasownik do sprawdzania logowania
-@app.route('/pogodzip/login/checkLogin', methods=['POST'])
+@app.route('/pogodzip/webapp/checkLogin', methods=['POST'])
 def checkLogin():
     _login = request.form['login']
     _password = request.form['pass']
@@ -118,32 +132,35 @@ def checkLogin():
     if checkUser(_login, _password):
         session['user'] = _login
         sid = str(uuid.uuid4())
+        #Wpisywanie danych do tokena JWT
         token_elems = {
             'login': _login,
             'sid': sid,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
             }
+        #Generowanie tokena
         token = str(jwt.encode(token_elems, jwt_secret_key))[2:-1]
+        #Dodawanie sesji użytkownika do bazy Redis
         r.hset('pogodzip:webapp:'+sid, 'login', _login)
         session['sid'] = sid
         session['token'] = token
-        return redirect('/pogodzip/login/home')
-    return redirect('/pogodzip/login/login')
+        return redirect('/pogodzip/webapp/home')
+    return redirect('/pogodzip/webapp/login')
 
 #Trasownik do pliku .CSS
-@app.route('/pogodzip/login/static/style.css', methods=['GET'])
+@app.route('/pogodzip/webapp/static/style.css', methods=['GET'])
 def downloadCss():
     return send_from_directory(directory='static', filename='style.css')
 
-#Trasownik do wysyłania plików
-@app.route('/pogodzip/login/upload')
-@app.route('/pogodzip/login/upload.html')
+#Trasownik do strony wysyłania plików
+@app.route('/pogodzip/webapp/upload')
+@app.route('/pogodzip/webapp/upload.html')
 def upload():
     return render_template('upload.html', token=session['token'])
 
-#Sprawdzanie użytkowników
-def checkUser(login, password):
-    redisPass = str(r.hget('pogodzip:webapp:users', login))[2:-1]
-    if redisPass == password:
+#Sprawdzanie poprawności danych logowania
+def checkUser(login, _password):
+    password = str(r.hget('pogodzip:webapp:users', login))[2:-1] #[2:-1] Usuwa dwa pierwsze znaki stringa
+    if password == _password:
         return True
     return False
