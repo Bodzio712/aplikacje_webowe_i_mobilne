@@ -61,7 +61,38 @@ def home():
         token = session['token']
         userfiles = str(r.hget('pogodzip:webapp:paths', user))[2:-1]
         path = '/pogodzip/dl/' + userfiles + '/'
+        pathWebapp = '/pogodzip/webapp/' + userfiles + '/'
         files = os.listdir(userfiles)
+
+        filesDisplay=["","","","",""]
+        paths=["","","","",""]
+        pathsWebapp=["","","","",""]
+
+        data = [["","",""],["","",""],["","",""],["","",""],["","",""]]
+
+        #Zapisywanie nazw plików użytkownika
+        i = 0
+        for x in filesDisplay:
+            if len(files) >= i+1:
+                data[i][0] = files[i]
+                filesDisplay[i] = files[i]
+                i += 1
+                
+
+        #Zapisywanie ścieżek uźytkownika        
+        i = 0
+        for x in paths:
+            if len(files) >= i+1:
+                paths[i] = path + filesDisplay[i]
+                i += 1
+
+        #Zapisywanie ścieżek do webapp
+        i = 0
+        for x in pathsWebapp:
+            if len(files) >= i+1:
+                pathsWebapp[i] = pathWebapp + filesDisplay[i]
+                i += 1
+
 
         #Przypisywanie ściezek do pilków
         if len(files) >= 1:
@@ -95,7 +126,7 @@ def home():
             file4 = ''
             path4 = ''
         #Renderowanie strony z plikami do pobrania
-        return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1, path2=path2, path3=path3, path4=path4, token=token)
+        return render_template('home.html', user=user, file0=file0, file1=file1, file2=file2, file3=file3, file4=file4, path0=path0, path1=path1, path2=path2, path3=path3, path4=path4, token=token, paths=paths, pathsWebapp=pathsWebapp, filesDisplay=filesDisplay, data=data)
     else:
         #Przekierowanie do logowania jeśli uzytkownik nie jest zalogowany
         return redirect('/pogodzip/webapp/login')
