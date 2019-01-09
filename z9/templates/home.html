@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Strona uzytkownika</title>
+		<link rel="Stylesheet" type="text/css" href="static/style.css" />
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<h1>Pliki Użytkownika:</h1>
+		{% for record in data %}
+			<form method="POST" action="{{record[1]}}" enctype="multipart/form-data">
+				<input type="submit" value="{{record[0]}}">
+                                <input type="hidden" name="token" value="{{token}}">
+                        </form>
+
+		{% endfor %}
+
+                <nav>
+                        <li><a href="index.html">Strona główna</a></li>
+                </nav>
+
+	</body>
+</html>
