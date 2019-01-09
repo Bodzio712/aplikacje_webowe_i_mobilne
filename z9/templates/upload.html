@@ -4,19 +4,39 @@
 		<title>Strona uzytkownika</title>
 		<link rel="Stylesheet" type="text/css" href="static/style.css" />
 		<meta charset="utf-8" />
-	</head>
-	<body>
-		<h1>Dodawanie plików</h1>
-		Wskaż plik do wysłania:
-		<form id="uploadFile" method="POST" action="/pogodzip/dl/uploading" enctype="multipart/form-data">
-      			<input type="file" id="browsing" name="file" value="Przeglądaj">
-			<input type="hidden" id="token" value="{{token}}">
-			<input type="submit" id="submitButton" value="Wyślij">
-		</form>
-		<br>
-                <nav>
-                        <li><a href="index.html">Strona główna</a></li>
-                </nav>
+		<link rel="Stylesheet" type="text/css" href="static/bootstrap.css" />
 
+        </head>
+        <body>
+                <div class="jumbotron">
+                        <p class="text-center"><h1><center>WEBAPP</center></h1></p>
+                </div>
+
+		<div class="jumbotron" id="loginname"><center>Witaj {{user}}</center></div>
+
+                <div class="container-fluid">
+                <div class="row">
+                        <div class="col">
+                                <div class="jumbotron">
+                                        <ul class="list-group">
+                                                <li class="list-group-item"><a href="login">Zaloguj się</a></li>
+                                                <li class="list-group-item"><a href="logout">Wyloguj się</a></li>
+                                                <li class="list-group-item"><a href="download">Pobierz plik</a></li>
+                                                <li class="list-group-item"><a href="upload">Wyślij plik</a></li>
+                                        </ul>
+                                </div>
+                        </div>
+                        <div class="col-8">
+                                <div class="jumbotron">
+					<h1>Dodawanie plików</h1>
+			                Wskaż plik do wysłania:
+                			<form id="uploadFile" method="POST" action="/pogodzip/dl/uploading" enctype="multipart/form-data">
+                			        <input type="file" id="browsing" name="file" value="Przeglądaj">
+                        			<input type="hidden" id="token" value="{{token}}">
+                        			<input type="submit" id="submitButton" value="Wyślij">
+                			</form>
+                                </div>
+                        </div>
+                </div>
 	</body>
 </html>

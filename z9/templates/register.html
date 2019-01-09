@@ -3,19 +3,40 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="Stylesheet" type="text/css" href="static/style.css" />
-	</head>
-	<body>
-		<h1>Zarejestruj</h1>
-		<form method="POST" action="http://pi.iem.pw.edu.pl/pogodzip/webapp/checkRegister">
-			<ul>
-				<li>Login: <input name="login" type="text" /></li>
-				<li>Hasło: <input name="pass" type="password"/></li>
-			</ul>
-			<input type="submit"/>
-		</form>
-		<br>
-                <nav>
-                        <li><a href="index.html">Strona główna</a></li>
-                </nav>
+		<link rel="Stylesheet" type="text/css" href="static/bootstrap.css" />
+
+        </head>
+        <body>
+                <div class="jumbotron">
+                        <p class="text-center"><h1><center>WEBAPP</center></h1></p>
+                </div>
+
+                <div class="jumbotron" id="loginname"><center>Zaloguj sie aby uzyskać dostęp do konta</center></div>
+
+                <div class="container-fluid">
+                <div class="row">
+                        <div class="col">
+                                <div class="jumbotron">
+                                        <ul class="list-group">
+                                                <li class="list-group-item"><a href="login">Zaloguj się</a></li>
+                                                <li class="list-group-item"><a href="logout">Wyloguj się</a></li>
+                                                <li class="list-group-item"><a href="download">Pobierz plik</a></li>
+                                                <li class="list-group-item"><a href="upload">Wyślij plik</a></li>
+                                        </ul>
+                                </div>
+                        </div>
+                        <div class="col-8">
+                                <div class="jumbotron">
+					<h1>Zarejestruj</h1>
+                			<form method="POST" action="http://pi.iem.pw.edu.pl/pogodzip/webapp/checkRegister">
+                        			<ul>
+                                		<li>Login: <input name="login" type="text" /></li>
+                                		<li>Hasło: <input name="pass" type="password"/></li>
+                        			</ul>
+                        		<input type="submit"/>
+                			</form>
+                                </div>
+                        </div>
+                </div>
 	</body>
 </html>

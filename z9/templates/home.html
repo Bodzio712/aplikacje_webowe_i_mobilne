@@ -3,21 +3,41 @@
 	<head>
 		<title>Strona uzytkownika</title>
 		<link rel="Stylesheet" type="text/css" href="static/style.css" />
-		<meta charset="utf-8" />
-	</head>
-	<body>
-		<h1>Pliki Użytkownika:</h1>
-		{% for record in data %}
-			<form method="POST" action="{{record[1]}}" enctype="multipart/form-data">
-				<input type="submit" value="{{record[0]}}">
-                                <input type="hidden" name="token" value="{{token}}">
-                        </form>
+		<link rel="Stylesheet" type="text/css" href="static/bootstrap.css" />
+		<script type="text/javascript" href="static/main.js"></script>
+                <meta charset="utf-8" />
+        </head>
+        <body>
+                <div class="jumbotron">
+                        <p class="text-center"><h1><center>WEBAPP</center></h1></p>
+                </div>
 
-		{% endfor %}
+		<div class="jumbotron" id="loginname"><center>Witaj {{user}}</center></div>
 
-                <nav>
-                        <li><a href="index.html">Strona główna</a></li>
-                </nav>
+                <div class="container-fluid">
+                <div class="row">
+                        <div class="col">
+                                <div class="jumbotron">
+                                        <ul class="list-group">
+                                                <li class="list-group-item"><a href="login">Zaloguj się</a></li>
+                                                <li class="list-group-item"><a href="logout">Wyloguj się</a></li>
+                                                <li class="list-group-item"><a href="download">Pobierz plik</a></li>
+                                                <li class="list-group-item"><a href="upload">Wyślij plik</a></li>
+                                        </ul>
+                                </div>
+                        </div>
+                        <div class="col-8">
+				<div class="jumbotron">
+					<h1>Pliki Użytkownika:</h1>
+			                {% for record in data %}
+                        		<form method="POST" action="{{record[1]}}" enctype="multipart/form-data">
+                        		        <input type="submit" value="{{record[0]}}">
+                                		<input type="hidden" name="token" value="{{token}}">
+                        		</form>
 
+                			{% endfor %}
+				</div>
+                        </div>
+                </div>
 	</body>
 </html>

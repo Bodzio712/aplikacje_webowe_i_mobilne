@@ -81,6 +81,7 @@ def callback_handling():
         'sid': sid,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
         }
+    session["name"] = userinfo["name"]
     #Generowanie tokena
     token = str(jwt.encode(token_elems, jwt_secret_key))[2:-1]
     #Dodawanie sesji użytkownika do bazy Redis
@@ -124,7 +125,7 @@ r = redis.Redis()
 @app.route('/pogodzip/webapp/index')
 @app.route('/pogodzip/webapp/index.html')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', user=session["name"])
 
 #Trasownik do logowania
 @app.route('/pogodzip/webapp/login')
@@ -184,7 +185,7 @@ def home():
             i += 1
 
     #Renderowanie strony z plikami do pobrania
-    return render_template('home.html', user=user, token=token, data=data)
+    return render_template('home.html', user=session["name"], token=token, data=data)
 
 #Trasownik do wylogowywania się
 @app.route('/pogodzip/webapp/logout')
@@ -195,6 +196,7 @@ def logout():
     session.pop('user', None)
     session.pop('sid', None)
     session.pop('token', None)
+    session["name"] = ""
     #Przekierowanie do strony głównej aplikacji
     return redirect('/pogodzip/webapp/')
 
@@ -203,11 +205,16 @@ def logout():
 def downloadCss():
     return send_from_directory(directory='static', filename='style.css')
 
+#Trasownik do pliku Bootstrap CSS
+@app.route('/pogodzip/webapp/static/bootstrap.css', methods=['GET'])
+def downloadBoostrap():
+    return send_from_directory(directory='static', filename='bootstrap.css')
+
 #Trasownik do strony wysyłania plików
 @app.route('/pogodzip/webapp/upload')
 @app.route('/pogodzip/webapp/upload.html')
 def upload():
-    return render_template('upload.html', token=session['token'])
+    return render_template('upload.html', token=session["token"], user=session['name'])
 
 #Sprawdzanie poprawności danych logowania
 def checkUser(login, _password):
