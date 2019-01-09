@@ -125,7 +125,12 @@ r = redis.Redis()
 @app.route('/pogodzip/webapp/index')
 @app.route('/pogodzip/webapp/index.html')
 def index():
-    return render_template('index.html', user=session["name"])
+    try:
+        username = session["name"]
+    except:
+        username = ""
+
+    return render_template('index.html', user=username)
 
 #Trasownik do logowania
 @app.route('/pogodzip/webapp/login')
@@ -185,7 +190,11 @@ def home():
             i += 1
 
     #Renderowanie strony z plikami do pobrania
-    return render_template('home.html', user=session["name"], token=token, data=data)
+    try:
+        username = session["name"]
+    except:
+        username = ""
+    return render_template('home.html', user=username, token=token, data=data)
 
 #Trasownik do wylogowywania się
 @app.route('/pogodzip/webapp/logout')
@@ -214,7 +223,11 @@ def downloadBoostrap():
 @app.route('/pogodzip/webapp/upload')
 @app.route('/pogodzip/webapp/upload.html')
 def upload():
-    return render_template('upload.html', token=session["token"], user=session['name'])
+    try:
+        username = session["name"]
+    except:
+        username = ""
+    return render_template('upload.html', token=session["token"], user=username)
 
 #Sprawdzanie poprawności danych logowania
 def checkUser(login, _password):

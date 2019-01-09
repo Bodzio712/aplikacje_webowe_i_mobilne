@@ -13,7 +13,7 @@
                 </div>
 
 		<div class="jumbotron" id="loginname"><center>Witaj {{user}}</center></div>
-
+		<div class="d-none d-lg-block">
                 <div class="container-fluid">
                 <div class="row">
                         <div class="col">
@@ -39,5 +39,33 @@
 				</div>
                         </div>
                 </div>
+		</div>
+		</div>
+		<div class="d-lg-none d-xl-none">
+		<div class="container-fluid">
+                                <div class="jumbotron">
+                                        <ul class="list-group">
+                                                <li class="list-group-item"><a href="login">Zaloguj się</a></li>
+                                                <li class="list-group-item"><a href="logout">Wyloguj się</a></li>
+                                                <li class="list-group-item"><a href="download">Pobierz plik</a></li>
+                                                <li class="list-group-item"><a href="upload">Wyślij plik</a></li>
+                                        </ul>
+                                </div>
+                                <div class="jumbotron">
+                                        <h1>Pliki Użytkownika:</h1>
+                                        {% for record in data %}
+                                        <form method="POST" action="{{record[1]}}" enctype="multipart/form-data">
+                                                <input type="submit" value="{{record[0]}}">
+                                                <input type="hidden" name="token" value="{{token}}">
+                                        </form>
+
+                                        {% endfor %}
+                                </div>
+                </div>
+		</div>
+		<div class="jumbotron">
+			<footer>Piotr Pogodziński</footer>
+		</div>
+
 	</body>
 </html>
