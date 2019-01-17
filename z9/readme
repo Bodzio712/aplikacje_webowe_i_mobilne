@@ -14,3 +14,14 @@ TERMIN: 3.01.19
 
 
 Wymagana jest osobna kompliacja plików biblioteki bootstrap v4 (sass)
+
+Projekt P8 (miniaturki)
+
+generic-producer --nadawca wiadomości do kolejki
+generic-customer --odbiorca wiadomości z kolejki, musi potwierdzać przerobienie
+
+AMQP server
+Exchange
+tryb direct lub topic
+Customer AMQP prztwarza jedną wiadomość. Musi jawnie poinfomować o przetworzeniu wiadomości.
+Parametr prefetch-count=1 określa, że program może na raz odebrac tylko jedną niepotwierdzoną wiadomość

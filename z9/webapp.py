@@ -132,6 +132,18 @@ def index():
 
     return render_template('index.html', user=username)
 
+#Trasownik do przesyłania zdjec
+@app.route('/pogodzip/webapp/miniatures/<path:filename>', methods=['GET', 'POST'])
+def userfiles(filename):
+    print(filename)
+    return send_from_directory(directory='miniatures', filename=filename)
+
+@app.route('/pogodzip/webapp/static/<path:filename>', methods=['GET', 'POST'])
+def stat(filename):
+    print(filename)
+    return send_from_directory(directory='static', filename=filename)
+
+
 #Trasownik do logowania
 @app.route('/pogodzip/webapp/login')
 @app.route('/pogodzip/webapp/login.html')
@@ -161,8 +173,9 @@ def home():
     filesDisplay=["","","","",""]
     paths=["","","","",""]
     pathsWebapp=["","","","",""]
+    pathsMiniature=["","","","",""]
 
-    data = [["","",""],["","",""],["","",""],["","",""],["","",""]]
+    data = [["","","",""],["","","",""],["","","",""],["","","",""],["","","",""]]
 
     #Zapisywanie nazw plików użytkownika
     i = 0
@@ -187,6 +200,15 @@ def home():
         if len(files) >= i+1:
             pathsWebapp[i] = pathWebapp + filesDisplay[i]
             data[i][2] = pathsWebapp[i]
+            i += 1
+
+    #Dodawanie ścieżek do miniatur
+    i = 0
+    for x in pathsMiniature:
+        if len(files) >= i+1:
+            if filesDisplay[i].endswith('.jpg'):
+                pathsMiniature[i] = '/pogodzip/webapp/miniatures/' +  userfiles + '/' +filesDisplay[i]
+                data[i][3] = pathsMiniature[i]
             i += 1
 
     #Renderowanie strony z plikami do pobrania
@@ -223,11 +245,12 @@ def downloadBoostrap():
 @app.route('/pogodzip/webapp/upload')
 @app.route('/pogodzip/webapp/upload.html')
 def upload():
+    user = session['user']
     try:
         username = session["name"]
     except:
         username = ""
-    return render_template('upload.html', token=session["token"], user=username)
+    return render_template('upload.html', token=str(r.hget('pogodzip:webapp:paths', user))[2:-1], user=username)
 
 #Sprawdzanie poprawności danych logowania
 def checkUser(login, _password):

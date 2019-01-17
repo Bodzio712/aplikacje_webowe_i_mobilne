@@ -14,6 +14,8 @@ import uuid
 import redis
 import jwt
 import datetime
+import json
+import pika
 
 app = Flask(__name__)
 
@@ -44,18 +46,17 @@ def download(file0):
 #Trasownik do metody obsługującej wysyłanie piku
 @app.route('/pogodzip/dl/uploading', methods=['POST'])
 def uploading():
-    if checkToken(request.form['token']):
-        user = getUser(token)
-        path = 'userfiles/' + str(user) + '/'
-        files = os.listdir('userfiles/' + str(user) + '/')
+        user = request.form["token"]
+        path = str(user) + '/'
+        files = os.listdir( str(user) + '/')
         toUpload = request.files['file']
         if len(files) <5:
             toUpload.save(path + toUpload.filename)
+            if (toUpload.filename.endswith('.jpg')):
+                sendToQueue(path)
             return redirect('/pogodzip/webapp/home')
         else:
             return redirect('/pogodzip/webapp/home')
-    
-    return redirect('/pogodzip/webapp/login')
 
 #Wyciąganie danych z tokena
 def checkToken(token):
@@ -77,3 +78,28 @@ def getUser(token):
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError) as e:
         return False
     return token_parts['login']
+
+#Wysyłanie pliku do kolejki
+def sendToQueue(path):
+    #Wybór trybu itd.
+    exchange = 'pogodzip'
+    exchange_type = 'direct'
+    routing_key = 'pogodzip-miniature'
+
+    #Formatowanie danych do JSON
+    toUpload = request.files['file']
+    data = json.dumps({'path': path, 'file': toUpload.filename})
+
+    #Definiowanie zawartości w body
+    body = '{}'.format(data)
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+
+    channel.exchange_declare(exchange=exchange,
+                         exchange_type=exchange_type)
+    channel.basic_publish(exchange=exchange,
+                      routing_key=routing_key,
+                      body=body)
+    connection.close()
+
